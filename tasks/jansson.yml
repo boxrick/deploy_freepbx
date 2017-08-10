@@ -1,0 +1,28 @@
+---
+# Jansson
+
+- name: Download and extract jansson
+  unarchive:
+    src: "{{ item }}"
+    dest: /usr/src
+    remote_src: yes
+  with_items: "{{ deploy_freepbx_jansson_packages }}"
+
+- name: Find jansson path
+  find:
+    file_type: directory
+    paths: /usr/src
+    patterns: "^jansson"
+    use_regex: yes
+  register: jannsson_path
+
+- name: Configure and install jannsson
+  command: "{{ item.command }}"
+  args:
+    chdir: "{{ jannsson_path.files.0.path }}"
+    creates: "{{ item.creates }}"
+  with_items:
+    - { command: 'autoreconf -i', creates: "{{ jannsson_path.files.0.path }}/install-sh" }
+    - { command: './configure --libdir=/usr/lib64', creates: "{{ jannsson_path.files.0.path }}/jansson.pc" }
+    - { command: 'make', creates: "{{ jannsson_path.files.0.path }}/src/.libs/" }
+    - { command: 'make install', creates: '/usr/local/include/jansson.h' }

@@ -1,0 +1,78 @@
+---
+# Asterisk
+
+- name: Download and extract Asterisk packages
+  unarchive:
+    src: "{{ item }}"
+    dest: /usr/src
+    remote_src: yes
+  with_items: "{{ deploy_freepbx_asterisk_packages }}"
+
+- name: Find Asterisk path
+  find:
+    file_type: directory
+    paths: /usr/src
+    patterns: "^asterisk"
+    use_regex: yes
+  register: asterisk_path
+
+- name: Install Asterisk prereqs - call a *magic* script
+  command: "contrib/scripts/install_prereq install"
+  args:
+    chdir: "{{ asterisk_path.files.0.path }}"
+  changed_when: false
+
+- name: Configure and install asterisk
+  command: "{{ item.command }}"
+  args:
+    chdir: "{{ asterisk_path.files.0.path }}"
+    creates: "{{ item.creates }}"
+  with_items:
+    - { command: './configure --libdir=/usr/lib64 --with-pjproject-bundled', creates: "{{ asterisk_path.files.0.path }}/config.log" }
+    - { command: 'contrib/scripts/get_mp3_source.sh', creates: "{{ asterisk_path.files.0.path }}/addons/mp3" }
+
+# Reference - https://wiki.asterisk.org/wiki/display/AST/Using+Menuselect+to+Select+Asterisk+Options
+- name: Make menuoptions template
+  template:
+    src: menuselect.makeopts.j2
+    dest: "{{ asterisk_path.files.0.path }}/menuselect.makeopts"
+
+# Git and find . -name ".gitignore" -exec rm -rf {} \; becomes useful here for checking changed files
+- name: Run final install for Asterisk
+  command: "{{ item.command }}"
+  args:
+    chdir: "{{ asterisk_path.files.0.path }}"
+    creates: "{{ item.creates }}"
+  register: install_asterisk
+  with_items:
+    - { command: 'make menuselect.makeopts', creates: "{{ asterisk_path.files.0.path }}/codecs/.makeopts" }
+    - { command: 'make', creates: "{{ asterisk_path.files.0.path }}/main/utils.o" }
+    - { command: 'make install', creates: "/usr/sbin/asterisk" }
+
+- name: Run final commands and config only after install
+  command: "{{ item }}"
+  args:
+    chdir: "{{ asterisk_path.files.0.path }}"
+  with_items:
+    - make config
+    - ldconfig
+  when: install_asterisk.changed
+
+- name: Make sure the default asterisk service is disabled
+  service:
+    name: "asterisk"
+    enabled: no
+
+- name: Make sure everything is owned by asterisk user
+  file:
+    path: "{{ item }}"
+    owner: asterisk
+    recurse: yes
+  with_items:
+    - /var/run/asterisk
+    - /etc/asterisk
+    - /var/lib/asterisk
+    - /var/log/asterisk
+    - /var/spool/asterisk
+    - /usr/lib64/asterisk
+    - /var/www/

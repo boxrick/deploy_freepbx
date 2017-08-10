@@ -1,0 +1,7 @@
+---
+# module: digital_ocean
+
+- include: install.yml
+- include: jansson.yml
+- include: asterisk.yml
+- include: freepbx.yml

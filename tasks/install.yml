@@ -1,0 +1,75 @@
+---
+# module: Install pre-reqs
+
+- name: Disable SELINUX
+  selinux:
+    state: disabled
+
+- name: Upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+    update_cache: true
+
+- name: Install various groups of packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - '@core'
+    - '@base'
+    - "@Development tools"
+
+- name: Add Asterisk user
+  user:
+    name: asterisk
+    state: present
+    comment: "Asterisk User"
+
+- name: Install mass of required packages
+  yum:
+    name: "{{ deploy_freepbx_packages }}"
+    state: present
+
+- name: Add remote repositories
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ deploy_freepbx_extra_repos }}"
+
+- name: Install php56
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ deploy_freepbx_php56 }}"
+
+- name: Install nodejs
+  yum:
+    name: "nodejs"
+    state: present
+
+- name: Make sure web and database services are started and enabled
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items: "{{ deploy_freepbx_web_db }}"
+
+- name: Remove test database and access to it
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - DROP DATABASE test
+    - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
+  changed_when: False
+  ignore_errors: True
+
+- name: Reload privilege tables
+  command: 'mysql -ne "{{ item }}"'
+  with_items:
+    - FLUSH PRIVILEGES
+  changed_when: False
+
+- name: Install legacy pear package
+  pear:
+    name: Console_Getopt
+    state: present

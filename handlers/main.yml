@@ -1,0 +1,10 @@
+---
+- name: restart_apache
+  service:
+    name: httpd
+    state: restarted
+
+- name: restart_freepbx
+  service:
+    name: freepbx
+    state: restarted
