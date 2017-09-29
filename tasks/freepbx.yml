@@ -36,11 +36,16 @@
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
   with_items:
-    - { path: '/etc/php.ini', line: 'upload_max_filesize = 120M', regexp: '^upload_max_filesize' }
     - { path: '/etc/httpd/conf/httpd.conf', line: 'User asterisk', regexp: '^User ' }
     - { path: '/etc/httpd/conf/httpd.conf', line: 'Group asterisk', regexp: '^Group ' }
 
+- name: Create custom PHP ini
+  template:
+    src: freepbx.ini.j2
+    dest: "/etc/php.d/freepbx.ini"
+  notify: restart_apache
+
 - name: Enable freepbx service
-   service:
-     name: "freepbx"
-     enabled: yes
+  service:
+    name: "freepbx"
+    enabled: yes

@@ -1,0 +1,15 @@
+# Test our Ansible role
+
+Vagrant.configure("2") do |config|
+  # Ubuntu Xenial 16.04
+  #config.vm.box = "ubuntu/xenial64"
+  # CentOS 7
+  config.vm.box = "centos/7"
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 443, host: 4443
+  # Trigger ansible playbook build
+    config.vm.provision "ansible" do |ansible|
+      # Run playbook
+      ansible.playbook = "test.yml"
+    end
+end

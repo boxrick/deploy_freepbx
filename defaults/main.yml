@@ -1,10 +1,9 @@
 ---
 # name: deploy_freepbx
 
-deploy_freepbx_packages: [ lynx, tftp-server, unixODBC, mysql-connector-odbc, mariadb-server, mariadb, httpd, ncurses-devel, sendmail, sendmail-cf, sox, newt-devel, libxml2-devel, libtiff-devel, audiofile-devel, gtk2-devel, subversion, kernel-devel, git, crontabs, cronie, cronie-anacron, wget, vim, uuid-devel, sqlite-devel, net-tools, gnutls-devel, python-devel, texinfo ]
+deploy_freepbx_packages: [ lynx, tftp-server, unixODBC, mysql-connector-odbc, mariadb-server, mariadb, httpd, ncurses-devel, sendmail, sendmail-cf, sox, newt-devel, libxml2-devel, libtiff-devel, audiofile-devel, gtk2-devel, subversion, kernel-devel, git, crontabs, cronie, cronie-anacron, wget, vim, uuid-devel, sqlite-devel, net-tools, gnutls-devel, python-devel, texinfo, mod_ssl ]
 
 deploy_freepbx_extra_repos:
-  - https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
   - https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
   - https://rpm.nodesource.com/pub_8.x/el/7/x86_64/nodesource-release-el7-1.noarch.rpm
 
@@ -21,3 +20,5 @@ deploy_freepbx_asterisk_packages:
 
 deploy_freepbx_freepbx_packages:
   - http://mirror.freepbx.org/modules/packages/freepbx/freepbx-14.0-latest.tgz
+
+deploy_freepbx_php_memory_limit: "512M"      # Custom memory limit configured within /etc/php.d/freepbx.ini

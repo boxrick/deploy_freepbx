@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: yes
+  gather_facts: true
+  become_method: sudo
+  vars:
+    # Variables if required by role:
+    # Role variables here
+    # example: 'test'
+    #
+  roles:
+    - role: "{{ playbook_dir | dirname | basename }}"

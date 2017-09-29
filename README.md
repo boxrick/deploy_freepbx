@@ -21,6 +21,12 @@ Description
 
 The intention of this role is to take everything here and place it into a role, it will basically take a fresh CentOS 7.XX system and deploy asterisk 14 and the latest Freepbx on the same machine.
 
+To test this locally simple move into the 'tests' folder. Have Vagrant, Virtualbox and Ansible installed. Then type
+
+`vagrant up`
+
+Once it has done installing and configuring open a web browser and navigate to http://127.0.0.1:8080 or https://127.0.0.1:4443  
+
 https://wiki.freepbx.org/display/FOP/Installing+FreePBX+14+on+CentOS+7
 
 Things to be aware of
