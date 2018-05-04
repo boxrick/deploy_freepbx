@@ -1,5 +1,6 @@
 deploy_freepbx
 =========
+[![Build Status](https://travis-ci.org/boxrick/deploy_freepbx.svg?branch=master)](https://travis-ci.org/boxrick/deploy_freepbx)
 
 This role installs Freepbx, Asterisk and all the required mass of packages needed on a CentOS 7.x
 
