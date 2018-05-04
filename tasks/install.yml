@@ -1,9 +1,23 @@
 ---
 # module: Install pre-reqs
 
+- name: Check if SELINUX packages are installed
+  stat:
+    path: /etc/selinux/config
+  register: selinux_present
+
+- name: Install packages required for Ansible to run against this host
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - libselinux-python
+  when: selinux_present.stat.exists != False
+
 - name: Disable SELINUX
   selinux:
     state: disabled
+  when: selinux_present.stat.exists != False 
 
 - name: Upgrade all packages
   yum:

@@ -4,9 +4,10 @@
   gather_facts: true
   become_method: sudo
   vars:
-    # Variables if required by role:
-    # Role variables here
-    # example: 'test'
-    #
+    proxy_env:
+      http_proxy: "{{ lookup('env','http_proxy') }}"
+      https_proxy: "{{ lookup('env','https_proxy') }}"
+      rsync_proxy: "{{ lookup('env','rsync_proxy') }}"
   roles:
-    - role: "{{ playbook_dir | dirname | basename }}"
+    - "{{ playbook_dir | dirname }}"
+  environment: "{{ proxy_env }}"

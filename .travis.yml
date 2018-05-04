@@ -1,0 +1,26 @@
+language: python
+sudo: true
+
+env:
+  - distro: ubuntu1804
+    container: centos7
+
+services:
+  - docker
+
+install:
+  - wget https://releases.hashicorp.com/vagrant/2.0.4/vagrant_2.0.4_x86_64.deb
+  - sudo apt install ./vagrant_2.0.4_x86_64.deb -y
+  - pip install -U pip wheel
+  - pip install ansible
+
+cache:
+  apt: true
+  pip: true
+  directories:
+    - $HOME/.cache/pip
+
+script:
+  - cd ./tests/
+  # Check Role
+  - vagrant up --provider docker $container

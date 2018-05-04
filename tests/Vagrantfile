@@ -1,15 +1,41 @@
-# Test our Ansible role
-
+# Test our role
 Vagrant.configure("2") do |config|
-  # Ubuntu Xenial 16.04
-  #config.vm.box = "ubuntu/xenial64"
-  # CentOS 7
-  config.vm.box = "centos/7"
+
   config.vm.network "forwarded_port", guest: 80, host: 8080
   config.vm.network "forwarded_port", guest: 443, host: 4443
-  # Trigger ansible playbook build
-    config.vm.provision "ansible" do |ansible|
-      # Run playbook
-      ansible.playbook = "test.yml"
+
+  config.vm.define "centos7", primary: true do |centos7|
+
+    # Virtualbox provider
+    centos7.vm.provider "virtualbox" do |v, override|
+      # Centos 7
+      override.vm.box = "centos/7"
     end
+
+    # Docker provider
+    centos7.vm.provider :docker do |d, override|
+      # Docker runs as root
+      override.ssh.username = 'root'
+      # Systemd needs privileged
+      d.privileged = true
+      # Custom image with ssh and systemd inside
+      # Centos7
+      d.image = "boxrick/centos7-docker-ansible"
+      # We can ssh to this docker image and it stays running forever
+      d.has_ssh = true
+      d.remains_running = true
+    end
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    # Pull requirements
+    ansible.galaxy_roles_path = ".vagrant/roles"
+    #ansible.galaxy_role_file = "requirements.yml"
+    # Run playbook
+    ansible.playbook = "test.yml"
+    # Set verbosity
+    ansible.verbose = true
+    # Increase default threads and allow pipelining for speed
+    ansible.raw_arguments = ['-T 25', '-e pipelining=True']
+  end
 end
