@@ -12,7 +12,7 @@ deploy_freepbx_php56: [ php56w, php56w-pdo, php56w-mysql, php56w-mbstring, php56
 deploy_freepbx_web_db: [ mariadb, httpd ]
 
 deploy_freepbx_jansson_packages:
-  - https://github.com/akheron/jansson/archive/v2.10.tar.gz
+  - https://github.com/akheron/jansson/archive/v2.11.tar.gz
 
 deploy_freepbx_asterisk_packages:
   - http://downloads.asterisk.org/pub/telephony/libpri/libpri-current.tar.gz

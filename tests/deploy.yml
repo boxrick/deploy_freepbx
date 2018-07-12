@@ -1,0 +1,5 @@
+---
+- hosts: examplehost
+  gather_facts: true
+  roles:
+    - "{{ playbook_dir | dirname }}"
